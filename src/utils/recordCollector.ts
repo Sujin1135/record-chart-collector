@@ -3,6 +3,7 @@ import {Element, load} from "cheerio";
 import {CheerioAPI} from "cheerio/lib/load";
 import rp from "request-promise";
 import {RecordSummary} from "../models/recordSummary";
+import {MusicDetail} from "../models/musicDetail";
 
 
 export abstract class RecordCollector {
@@ -14,14 +15,16 @@ export abstract class RecordCollector {
     vendor: Vendor;
     defaultUrl: string;
 
+    public abstract findRecordChart(): Promise<RecordSummary[]>;
+
+    public abstract findAlbumDetailsByAlbumIds(ids: number[]): Promise<MusicDetail[]>;
+
     private getOptions(uri: string) {
         return {
             uri: `${this.defaultUrl}/${uri}`,
             transform: (body: any): CheerioAPI => load(body),
         }
     }
-
-    public abstract findRecordChart(): Promise<RecordSummary[]>;
 
     public async scrapChart(uri: string = ""): Promise<CheerioAPI> {
         const vendor = this.vendor;

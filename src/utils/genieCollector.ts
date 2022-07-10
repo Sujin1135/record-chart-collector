@@ -2,6 +2,8 @@ import {RecordCollector} from "./recordCollector";
 import {Vendor} from "../enums/vendor";
 import {CheerioAPI} from "cheerio/lib/load";
 import {RecordSummary} from "../models/recordSummary";
+import {MusicDetail} from "../models/musicDetail";
+import _ from "lodash";
 
 export class GenieCollector extends RecordCollector {
     constructor() {
@@ -13,6 +15,30 @@ export class GenieCollector extends RecordCollector {
             ...await this.extractRecords("chart/top200"),
             ...await this.extractRecords("chart/top200?ditc=D&pg=2"),
         ];
+    }
+
+    findAlbumDetailsByAlbumIds = async (ids: number[]): Promise<MusicDetail[]> => {
+        const temp = {};
+        const result: MusicDetail[] = [];
+
+        for (const id of ids) {
+            const tempData = _.get(temp, id);
+
+            if (tempData) {
+                result.push(tempData as MusicDetail);
+                continue;
+            }
+
+            const data = await this.scrapChart(`detail/albumInfo?axnm=${id}`)
+                .then(($: CheerioAPI) => {
+                    const arr = this.extractText($, ".value");
+                    const detail = {publisher: arr[2], agency: arr[3]};
+                    _.set(temp, id, detail);
+                    return detail;
+                });
+            result.push(data);
+        }
+        return result;
     }
 
     private async extractRecords(uri: string) {
