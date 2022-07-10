@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
+    "lodash": "^4.17.21",
     "request": "^2.88.2"
   }
 }
