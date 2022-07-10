@@ -22,12 +22,7 @@ export class GenieCollector extends RecordCollector {
         const result: MusicDetail[] = [];
 
         for (const id of ids) {
-            const tempData = _.get(temp, id);
-
-            if (tempData) {
-                result.push(tempData as MusicDetail);
-                continue;
-            }
+            if (_.get(temp, id)) continue;
 
             const data = await this.scrapChart(`detail/albumInfo?axnm=${id}`)
                 .then(($: CheerioAPI) => {
